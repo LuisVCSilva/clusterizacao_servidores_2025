@@ -13,3 +13,10 @@ int main(int argc, char *argv[]) {
     MPI_Finalize(); // Finaliza MPI
     return 0;
 }
+/* Relato de Caio
+ * Esse programa é escrito em c, e utiliza a biblioteca de mpi para
+ * aplicar o conceito de clusterização utilizando os núcleos do processador
+ * no lugar de computadores e máquinas virtuais. O código executa a mesma tarefa
+ * que nesse caso é um printf em vários núcleos simultaneamente.
+ * O conceito de clusterização tem como objetivo dividir tarefas em diferentes máquinas
+ * agilizando o processo e o código aplica isso com os núcleos.*/
