@@ -79,9 +79,8 @@ topologia_rede.png         -> Diagrama da topologia inicial.
 
 ---
 
-## Mini-Aula Sugerida
+## Mini-Aula
 
-- Conceitos: **latência**, **jitter**, **clusterização**, **impacto do ruído em links**.  
 - Exercício Boxplot:
   - Identificar host com maior dispersão (jitter) e explicar causas (ruído, múltiplos caminhos, proximidade).  
 - Exercício Extensão de Topologia:
@@ -89,8 +88,6 @@ topologia_rede.png         -> Diagrama da topologia inicial.
 - Interpretação Heatmap:
   - Diagonal principal = latência zero.  
   - Cores mais claras = maior RTT.  
-  - Permite identificar clusters naturais na rede.
-
 ---
 
 ---------------------------------------------------------
@@ -108,4 +105,3 @@ sudo python3 hello/hello.py
 Observações:
 - Executar scripts com permissões de superusuário devido ao Mininet.
 - Visualizar heatmaps e boxplots para análise de clusterização, jitter e impacto do ruído.
-- Ideal para uso em aulas práticas de redes e clusterização de servidores.
