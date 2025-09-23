@@ -1,0 +1,61 @@
+1. **Acompanhar o status da tarefa**
+
+- No frontend, a página já faz isso automaticamente, mas você também pode testar manualmente usando curl:
+
+curl http://localhost:5000/status/<task_id>
+
+Substitua <task_id> pelo ID que você recebeu ao iniciar a tarefa.  
+Você verá respostas tipo:
+
+- {"state":"PENDING","status":"Pending..."} — tarefa aguardando execução
+- {"state":"SUCCESS","result":20} — tarefa finalizada, resultado retornado
+- {"state":"FAILURE","status":"<erro>"} — tarefa falhou (se acontecer)
+
+---
+
+2. **Iniciar múltiplas tarefas**
+
+- Clique várias vezes no botão “Iniciar Tarefa” no navegador para disparar várias tarefas em paralelo.
+- Veja se cada tarefa recebe um task_id único e se o status/resultado aparece corretamente para cada uma (se quiser, pode modificar o frontend para armazenar múltiplos IDs).
+
+---
+
+3. **Testar com valores diferentes**
+
+- No código atual, a tarefa soma x + x, sendo x=10 fixo.
+- Modifique o frontend para enviar diferentes valores no JSON (exemplo: {"x": 5}, {"x": 20}) e veja se o resultado muda conforme esperado.
+
+---
+
+4. **Testar falha na tarefa**
+
+- Você pode modificar a função add_together para lançar uma exceção em algum caso (ex: se x for negativo).
+- Assim, veja como o status “FAILURE” aparece no frontend e no endpoint /status.
+
+Exemplo:
+
+@celery.task(bind=True)
+def add_together(self, x, y):
+    if x < 0 or y < 0:
+        raise ValueError("Não aceitamos números negativos!")
+    time.sleep(5)
+    return x + y
+
+---
+
+5. **Escalar o worker**
+
+- Se tiver mais de uma máquina, rode múltiplos workers Celery para ver como as tarefas são distribuídas.
+- No mesmo host, abra mais terminais e execute:
+
+celery -A app.celery worker --loglevel=info
+
+em cada um para simular um cluster.
+
+---
+
+6. **Monitorar o Redis**
+
+- Use o comando redis-cli monitor para ver as mensagens trafegando no broker.
+
+---

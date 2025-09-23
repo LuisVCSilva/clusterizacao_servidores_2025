@@ -1,0 +1,171 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\title[Clusterização de Servidores]{Clusterização de Servidores: Conceitos e Finalidades}
+\author[Prof. Me. Luis Vinicius Costa Silva]{Prof. Me. Luis Vinicius Costa Silva\\Faculdade Atenas}
+\date{Aula 1}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}{Plano de Ensino}
+\begin{itemize}
+    \item Tema: Clusterização de Servidores
+    \item Aula 1: Introdução aos Servidores - conceitos e finalidades
+    \item Aula 2: Fundamentos da Computação em Cluster
+\end{itemize}
+\end{frame}
+
+\begin{frame}{O que é um Servidor?}
+\begin{itemize}
+    \item Equipado com processadores, memória, armazenamento e softwares dedicados.
+    \item Pode ser um recurso lógico que processa aplicações e serve dados.
+    \item Pode ser físico ou virtual, local ou remoto.
+    \item Escalável e com alto poder de processamento.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Arquitetura Cliente/Servidor}
+\begin{itemize}
+    \item Modelo onde clientes acessam dados centralizados em servidores.
+    \item Fornece roteamento, controle de acesso e compartilhamento de recursos.
+    \item Exemplo: várias estações acessando banco de dados centralizado.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Servidores em Redes Locais (LAN)}
+\begin{itemize}
+    \item Também chamados de servidores dedicados.
+    \item Executam aplicações administrativas, banco de dados, backup, etc.
+    \item Gabinetes: torre, rack 19", blade.
+    \item SOs comuns: Linux (Red Hat, Ubuntu Server), Windows Server.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Servidores via Internet}
+\begin{itemize}
+    \item Instalados em datacenters para prestação de serviços online.
+    \item Funções: hospedagem, e-mail, streaming, armazenamento em nuvem.
+    \item Requisitos: redundância, balanceamento de carga, alta disponibilidade.
+    \item Ex: AWS, Azure, Google Cloud.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{VM x Container / Docker x Kubernetes}
+\textbf{Máquina Virtual (VM)} vs \textbf{Container}:
+\begin{itemize}
+    \item \textbf{VM}: emula um sistema completo (hardware + SO). Mais pesada.
+    \item \textbf{Container}: compartilha o kernel do host. Mais leve e rápida.
+\end{itemize}
+
+\vspace{0.5cm}
+\textbf{Docker} vs \textbf{Kubernetes}:
+\begin{itemize}
+    \item \textbf{Docker}: plataforma para criar, empacotar e executar containers.
+    \item \textbf{Kubernetes}: orquestrador para gerenciar múltiplos containers em cluster.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Tipos Comuns de Servidores}
+\begin{itemize}
+    \item Aplicação: sistemas acessados por múltiplas estações.
+    \item Arquivos: armazenamento e compartilhamento centralizado.
+    \item Banco de Dados: alto desempenho para dados transacionais.
+    \item Mídia: streaming de áudio e vídeo.
+    \item E-mail: envio, recepção e armazenamento.
+    \item Backup: cópias seguras de dados.
+    \item FTP: upload/download via FTP.
+    \item Proxy: filtragem e intermediação de acesso.
+    \item Web: hospedagem de sites e aplicações.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Softwares e Protocolos Associados}
+\begin{itemize}
+    \item Web: Apache, NGINX
+    \item FTP: FileZilla Server
+    \item E-mail: Postfix, Exchange
+    \item Backup: Bacula, Veeam
+    \item Proxy: Squid
+    \item Banco de Dados: MySQL, PostgreSQL, SQL Server
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Definição de Cluster}
+\begin{itemize}
+    \item Grupo de computadores interconectados que funcionam como uma única máquina.
+    \item Usam redes locais de alta velocidade.
+    \item Alternativa de melhor custo-benefício comparado a supercomputadores.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Arquitetura de um Cluster}
+\begin{itemize}
+    \item Nós de computação: executam as tarefas.
+    \item Front-end: monitora hardware/software.
+    \item Servidor de arquivos: fornece dados para os nós.
+    \item Rede de serviço: comunicação entre os nós.
+    \item Gateway: acesso externo.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Vantagens dos Clusters}
+\begin{itemize}
+    \item Custo-benefício com hardware padrão.
+    \item Escalabilidade e paralelismo.
+    \item Tolerância a falhas e manutenção facilitada.
+    \item Flexibilidade e suporte a programação paralela.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Tipos de Clusters}
+\begin{itemize}
+    \item HPC (Computação de Alto Desempenho)
+    \item HA (Alta Disponibilidade)
+    \item Balanceamento de Carga
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Balanceamento de Carga}
+\begin{itemize}
+    \item Distribuição de tarefas entre nós para evitar sobrecarga.
+    \item Níveis: aplicação, transporte, rede.
+    \item Usado em servidores web/FTP de alta demanda.
+    \item Algoritmos: Round Robin, Least Connections, etc.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Ambiente de Usuário HPC}
+\begin{itemize}
+    \item SO: Linux, Unix
+    \item Acesso: SSH \ (ssh usuario@servidor)
+    \item Transferência: SCP, SFTP
+    \item Escalonadores: Slurm, PBS
+    \item Compiladores: GCC, Intel, PGI
+    \item MPI: OpenMPI, MPICH
+    \item Linguagens: C, C++, Fortran, Python, R
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Comandos Unix Básicos}
+\begin{itemize}
+    \item Arquivos e diretórios: ls, cd, mkdir, rm
+    \item Permissões: chmod, chgrp
+    \item Visualização: cat, less, head, tail
+    \item Editor: vi nome-do-arquivo
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Transferência de Arquivos}
+\begin{itemize}
+    \item SCP: \texttt{scp arquivo.txt usuario@host:/caminho}
+    \item SFTP: \texttt{sftp usuario@host}
+    \item Cliente gráfico: FileZilla
+\end{itemize}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,95 @@
+\documentclass{beamer}
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+
+\title{Comandos Principais do MPI}
+\author{Luis Vinicius -- UniAtenas}
+\date{Julho de 2025}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}{MPI\_Init}
+\textbf{Função:} Inicializa o ambiente MPI. \\
+\textbf{Observações:}
+\begin{itemize}
+    \item Deve ser a primeira chamada em qualquer programa MPI.
+    \item Prepara todos os processos para comunicação.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{MPI\_Finalize}
+\textbf{Função:} Finaliza o ambiente MPI. \\
+\textbf{Observações:}
+\begin{itemize}
+    \item Deve ser a última chamada do programa MPI.
+    \item Libera recursos usados pelo MPI.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{MPI\_Comm\_rank}
+\textbf{Função:} Retorna o \textit{rank} (identificador) do processo dentro do comunicador. \\
+\textbf{Usos:}
+\begin{itemize}
+    \item Diferenciar a lógica de cada processo.
+    \item Controlar o papel de cada processo (ex: mestre vs trabalhadores).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{MPI\_Comm\_size}
+\textbf{Função:} Retorna o número total de processos no comunicador. \\
+\textbf{Usos:}
+\begin{itemize}
+    \item Descobrir quantos processos estão disponíveis.
+    \item Controlar loops de comunicação.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{MPI\_Send e MPI\_Recv}
+\textbf{Função:} Envio e recebimento de mensagens ponto-a-ponto. \\
+\textbf{Características:}
+\begin{itemize}
+    \item Comunicação explícita entre dois processos.
+    \item Pode causar bloqueios se não coordenado corretamente.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{MPI\_Bcast}
+\textbf{Função:} Envia os mesmos dados de um processo (root) para todos os outros. \\
+\textbf{Aplicações:}
+\begin{itemize}
+    \item Compartilhar dados comuns (ex: parâmetros de entrada).
+    \item Reduz complexidade comparado a múltiplos \texttt{Send}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{MPI\_Reduce}
+\textbf{Função:} Realiza uma operação de redução entre processos (soma, máximo, etc). \\
+\textbf{Exemplos de uso:}
+\begin{itemize}
+    \item Somar os resultados locais em um processo central.
+    \item Encontrar mínimo/máximo global.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{MPI\_Wtime}
+\textbf{Função:} Retorna tempo de execução (em segundos). \\
+\textbf{Aplicações:}
+\begin{itemize}
+    \item Medir tempo de comunicação.
+    \item Avaliar desempenho de trechos paralelos.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{MPI\_ANY\_SOURCE e MPI\_ANY\_TAG}
+\textbf{Função:} Receber mensagens de qualquer origem ou com qualquer tag. \\
+\textbf{Usos:}
+\begin{itemize}
+    \item Quando a ordem dos remetentes é imprevisível.
+    \item Útil em servidores MPI ou balanceamento de carga.
+\end{itemize}
+\end{frame}
+
+\end{document}

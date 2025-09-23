@@ -1,0 +1,117 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single
+}
+
+\title{Guia de Instalação do Ubuntu no WSL com XFCE4 Terminal}
+\author{Produzido com \LaTeX}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introdução}
+Este guia descreve como instalar o \textbf{Ubuntu} no \textbf{WSL (Windows Subsystem for Linux)} e configurar o \textbf{XFCE4 Terminal} para um ambiente de terminal mais amigável.
+
+\section{Habilitar o WSL no Windows}
+
+Abra o \textbf{PowerShell} como Administrador e execute:
+
+\begin{lstlisting}[language=bash]
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+wsl --set-default-version 2
+\end{lstlisting}
+
+Reinicie o computador se solicitado.
+
+\section{Instalação do Ubuntu}
+
+\subsection{Pela Microsoft Store (Recomendado)}
+\begin{enumerate}
+    \item Abra a \textbf{Microsoft Store}.
+    \item Pesquise por \textbf{Ubuntu}.
+    \item Instale a versão desejada (ex.: \textbf{Ubuntu 22.04 LTS}).
+\end{enumerate}
+
+\subsection{Via PowerShell (Alternativa sem Store)}
+Se preferir, instale via terminal:
+
+\begin{lstlisting}[language=bash]
+wsl --install -d Ubuntu
+# ou escolha uma versão específica:
+# wsl --install -d Ubuntu-22.04
+\end{lstlisting}
+
+Após a instalação, abra o Ubuntu no menu iniciar. Na primeira execução será necessário criar um usuário e senha.
+
+\section{Atualização do Sistema}
+
+Dentro do terminal do Ubuntu, execute:
+
+\begin{lstlisting}[language=bash]
+sudo apt update && sudo apt upgrade -y
+\end{lstlisting}
+
+\section{Instalação do XFCE4 Terminal}
+
+O \textbf{XFCE4 Terminal} oferece uma interface mais amigável que o terminal padrão.
+
+\subsection{Instalar o XFCE4 Terminal}
+
+\begin{lstlisting}[language=bash]
+sudo apt install xfce4-terminal -y
+\end{lstlisting}
+
+\subsection{Executar o XFCE4 Terminal}
+
+Para iniciar o XFCE4 Terminal no WSL:
+
+\begin{lstlisting}[language=bash]
+xfce4-terminal
+\end{lstlisting}
+
+\textbf{Observação:} Para usar interfaces gráficas no WSL é necessário um servidor X no Windows, como o \textbf{VcXsrv} ou \textbf{X410}.
+
+\subsection{Instalar e Configurar um Servidor X (Opcional)}
+
+\begin{enumerate}
+    \item Instale o \textbf{VcXsrv} no Windows: \url{https://sourceforge.net/projects/vcxsrv/}
+    \item Abra o VcXsrv com a configuração \textbf{Multiple Windows}.
+    \item No terminal do Ubuntu, exporte a variável de exibição:
+\end{enumerate}
+
+\begin{lstlisting}[language=bash]
+echo "export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0" >> ~/.bashrc
+source ~/.bashrc
+\end{lstlisting}
+
+Após isso, rode novamente:
+
+\begin{lstlisting}[language=bash]
+xfce4-terminal
+\end{lstlisting}
+
+\section{Verificação da Versão do Ubuntu}
+
+Para verificar a versão instalada:
+
+\begin{lstlisting}[language=bash]
+lsb_release -a
+\end{lstlisting}
+
+
+\end{document}

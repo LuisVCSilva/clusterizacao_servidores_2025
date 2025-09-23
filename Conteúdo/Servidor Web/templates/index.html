@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Flask + Celery Demo</title>
+</head>
+<body>
+  <h1>Flask + Celery Demo</h1>
+  <button onclick="startTask()">Iniciar Tarefa</button>
+  <p id="status">Clique no botão para iniciar a tarefa.</p>
+  <script>
+    let taskId = null;
+
+    function startTask() {
+      document.getElementById('status').innerText = 'Iniciando tarefa...';
+      fetch('/longtask', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({x: 10})
+      })
+      .then(response => response.json())
+      .then(data => {
+        taskId = data.task_id;
+        document.getElementById('status').innerText = 'Tarefa iniciada. ID: ' + taskId;
+        checkStatus();
+      });
+    }
+
+    function checkStatus() {
+      if (!taskId) return;
+      fetch('/status/' + taskId)
+        .then(response => response.json())
+        .then(data => {
+          if(data.state === 'PENDING') {
+            document.getElementById('status').innerText = 'Status: Pendente...';
+            setTimeout(checkStatus, 1000);
+          } else if (data.state === 'SUCCESS') {
+            document.getElementById('status').innerText = 'Resultado: ' + data.result;
+          } else if (data.state === 'FAILURE') {
+            document.getElementById('status').innerText = 'Falha: ' + data.status;
+          } else {
+            document.getElementById('status').innerText = 'Status: ' + data.state;
+            setTimeout(checkStatus, 1000);
+          }
+        });
+    }
+  </script>
+</body>
+</html>

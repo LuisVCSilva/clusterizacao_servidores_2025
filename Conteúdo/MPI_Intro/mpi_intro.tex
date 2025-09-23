@@ -1,0 +1,92 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usetheme{Madrid}
+
+\title{Introdução ao MPI}
+\author{Luis Vinicius}
+\institute{UniAtenas — Clusterização de Servidores}
+\date{Aula 22}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Objetivo da Aula}
+\begin{itemize}
+    \item Entender o modelo de troca de mensagens com MPI.
+    \item Conhecer os comandos básicos de compilação e execução.
+    \item Explorar exemplos simples de programas paralelos.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{O que é MPI?}
+\begin{itemize}
+    \item MPI (Message Passing Interface) é um padrão para comunicação entre processos em sistemas distribuídos.
+    \item Usado amplamente em computação de alto desempenho (HPC).
+    \item Permite comunicação ponto-a-ponto e comunicação coletiva.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Modelo MPI}
+\begin{itemize}
+    \item Cada processo tem memória própria.
+    \item A comunicação ocorre por meio de envio e recebimento de mensagens.
+    \item Não há memória compartilhada.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Comandos Básicos}
+\begin{itemize}
+    \item Compilar: \texttt{mpicc nome\_arquivo.c -o nome\_executavel}
+    \item Executar: \texttt{mpirun -np 4 ./nome\_executavel}
+    \item Use o arquivo \texttt{comandos.txt} para revisar os comandos mais usados.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Arquivos de Exemplo}
+Os seguintes arquivos contêm exemplos ilustrativos:
+\begin{itemize}
+    \item \texttt{ola\_mundo.c} — exemplo básico de comunicação.
+    \item \texttt{envio.c} — envio simples entre processos.
+    \item \texttt{vetores.c} — distribuição e soma de vetores.
+    \item \texttt{comm\_circular.c} — comunicação em anel.
+    \item \texttt{troca\_mensagem.c} — troca entre dois processos.
+    \item \texttt{temporizacao.c} — uso de temporização com MPI.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Execução em Cluster}
+\begin{itemize}
+    \item Utilize \texttt{hosts.txt} para indicar os nós do cluster.
+    \item Exemplo: \texttt{mpirun --hostfile hosts.txt -np 4 ./ola\_mundo}
+    \item Teste local com \texttt{--oversubscribe}, se necessário.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Resumo}
+\begin{itemize}
+    \item MPI é uma poderosa ferramenta de paralelização.
+    \item Comunicação explícita entre processos.
+    \item Vários exemplos prontos para estudo.
+    \item Pratique com os arquivos fornecidos e adapte para seus testes.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Próximos Passos}
+\begin{itemize}
+    \item Modificar os exemplos dados.
+    \item Testar em diferentes números de processos.
+    \item Medir desempenho com \texttt{temporizacao.c}.
+    \item Explorar padrões de comunicação complexos.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+    \centering
+    \Huge Dúvidas?
+\end{frame}
+
+\end{document}

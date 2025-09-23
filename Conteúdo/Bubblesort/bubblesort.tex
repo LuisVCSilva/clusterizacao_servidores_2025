@@ -1,0 +1,204 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usetheme{Madrid}
+\usepackage{courier} % Fonte monoespaçada
+\usepackage{verbatim} % Para mostrar código como texto bruto
+
+\title{Ordenação com MPI: Bubble Sort Distribuído}
+\author{Luis Vinicius}
+\date{\today}
+
+\begin{document}
+
+% Título
+\frame{\titlepage}
+
+
+\begin{frame}{Bubble Sort Tradicional em C}
+\textbf{Objetivo:} Ordenar um vetor comparando pares adjacentes e "empurrando" o maior para o fim a cada passagem.
+
+\vspace{1em}
+\textbf{Algoritmo:}
+\begin{itemize}
+    \item Dois laços \texttt{for}: o externo controla o número de passagens.
+    \item O laço interno compara e troca elementos adjacentes.
+    \item Após cada iteração do laço externo, o maior valor restante "borbulha" para o final.
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Complexidade:} $\mathcal{O}(n^2)$ no pior caso.
+
+\vspace{0.5em}
+\textbf{Aplicação:} Simples, porém ineficiente para grandes volumes de dados — útil para introdução à lógica de ordenação.
+\end{frame}
+
+\begin{frame}{Teste de Mesa: Bubble Sort Tradicional}
+\textbf{Vetor inicial:} \texttt{\{5, 3, 8, 4, 2\}}
+
+\vspace{0.5em}
+\textbf{Passo a passo:}
+
+\begin{itemize}
+    \item \textbf{1ª passagem:} compara e troca
+    \begin{itemize}
+        \item 5 > 3 → troca → \texttt{\{3, 5, 8, 4, 2\}}
+        \item 5 < 8 → mantém
+        \item 8 > 4 → troca → \texttt{\{3, 5, 4, 8, 2\}}
+        \item 8 > 2 → troca → \texttt{\{3, 5, 4, 2, 8\}}
+    \end{itemize}
+    \item \textbf{2ª passagem:}
+    \begin{itemize}
+        \item 3 < 5 → mantém
+        \item 5 > 4 → troca → \texttt{\{3, 4, 5, 2, 8\}}
+        \item 5 > 2 → troca → \texttt{\{3, 4, 2, 5, 8\}}
+    \end{itemize}
+    \item \textbf{3ª passagem:}
+    \begin{itemize}
+        \item 3 < 4 → mantém
+        \item 4 > 2 → troca → \texttt{\{3, 2, 4, 5, 8\}}
+    \end{itemize}
+    \item \textbf{4ª passagem:}
+    \begin{itemize}
+        \item 3 > 2 → troca → \texttt{\{2, 3, 4, 5, 8\}}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Resultado final:} \texttt{\{2, 3, 4, 5, 8\}}
+\end{frame}
+
+
+% Slide de explicação do código
+\begin{frame}{Bubble Sort com MPI: Explicação + Teste de Mesa}
+\textbf{Objetivo:} Ordenar um vetor distribuindo partes entre processos MPI.
+
+\vspace{0.5em}
+\textbf{Etapas do código:}
+\begin{enumerate}
+    \item \textbf{Inicialização:} MPI inicia, cada processo descobre seu \texttt{rank}.
+    \item \textbf{Divisão:} Processo 0 gera vetor e distribui com \texttt{MPI\_Scatter}.
+    \item \textbf{Ordenação local:} Cada processo aplica Bubble Sort em sua parte.
+    \item \textbf{Coleta:} Partes ordenadas retornam com \texttt{MPI\_Gather}.
+    \item \textbf{Ordenação final:} Processo 0 faz Bubble Sort no vetor completo.
+\end{enumerate}
+
+\vspace{0.5em}
+\textbf{Teste de Mesa (4 processos, vetor com 8 elementos):}
+
+\begin{itemize}
+    \item Vetor original (gerado no processo 0): \texttt{\{8, 3, 7, 4, 2, 9, 1, 5\}}
+    \item Divisão por processo:
+    \begin{itemize}
+        \item P0: \texttt{8, 3} → \texttt{3, 8}
+        \item P1: \texttt{7, 4} → \texttt{4, 7}
+        \item P2: \texttt{2, 9} → \texttt{2, 9}
+        \item P3: \texttt{1, 5} → \texttt{1, 5}
+    \end{itemize}
+    \item Reunião em P0: \texttt{\{3, 8, 4, 7, 2, 9, 1, 5\}}
+    \item Ordenação final em P0: \texttt{\{1, 2, 3, 4, 5, 7, 8, 9\}}
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Nota:} A ordenação local é paralela. A fusão final ainda é sequencial.
+\end{frame}
+
+
+\begin{frame}{Explicação do Código: Bubble Sort com MPI}
+\textbf{Objetivo:} Ordenar um vetor usando múltiplos processos com MPI.
+
+\vspace{1em}
+\textbf{Etapas principais do código:}
+
+\begin{enumerate}
+    \item \textbf{Inicialização do MPI:}
+    \begin{itemize}
+        \item Cada processo descobre seu \texttt{rank} e o total de processos com \texttt{MPI\_Comm\_rank} e \texttt{MPI\_Comm\_size}.
+    \end{itemize}
+
+    \item \textbf{Distribuição do vetor:}
+    \begin{itemize}
+        \item O processo 0 cria um vetor com números inteiros.
+        \item O vetor é dividido igualmente entre os processos usando \texttt{MPI\_Scatter}.
+    \end{itemize}
+
+    \item \textbf{Ordenação local:}
+    \begin{itemize}
+        \item Cada processo aplica Bubble Sort na sua parte do vetor.
+    \end{itemize}
+
+    \item \textbf{Coleta das partes ordenadas:}
+    \begin{itemize}
+        \item As partes locais são enviadas de volta ao processo 0 com \texttt{MPI\_Gather}.
+    \end{itemize}
+
+    \item \textbf{Ordenação final (processo 0):}
+    \begin{itemize}
+        \item O processo 0 aplica Bubble Sort no vetor completo para garantir ordenação global.
+    \end{itemize}
+\end{enumerate}
+
+\vspace{0.5em}
+\textbf{Observação:} A ordenação local é paralela, mas a fusão final ainda é sequencial.
+\end{frame}
+
+\begin{frame}{Bubble Sort com MPI: Explicação + Teste de Mesa}
+\textbf{Objetivo:} Ordenar um vetor distribuindo partes entre processos MPI.
+
+\vspace{0.5em}
+\textbf{Etapas do código:}
+\begin{enumerate}
+    \item \textbf{Inicialização:} MPI inicia, cada processo descobre seu \texttt{rank}.
+    \item \textbf{Divisão:} Processo 0 gera vetor e distribui com \texttt{MPI\_Scatter}.
+    \item \textbf{Ordenação local:} Cada processo aplica Bubble Sort em sua parte.
+    \item \textbf{Coleta:} Partes ordenadas retornam com \texttt{MPI\_Gather}.
+    \item \textbf{Ordenação final:} Processo 0 faz Bubble Sort no vetor completo.
+\end{enumerate}
+
+\vspace{0.5em}
+\textbf{Teste de Mesa (4 processos, vetor com 8 elementos):}
+
+\begin{itemize}
+    \item Vetor original (gerado no processo 0): \texttt{\{8, 3, 7, 4, 2, 9, 1, 5\}}
+    \item Divisão por processo:
+    \begin{itemize}
+        \item P0: \texttt{8, 3} → \texttt{3, 8}
+        \item P1: \texttt{7, 4} → \texttt{4, 7}
+        \item P2: \texttt{2, 9} → \texttt{2, 9}
+        \item P3: \texttt{1, 5} → \texttt{1, 5}
+    \end{itemize}
+    \item Reunião em P0: \texttt{\{3, 8, 4, 7, 2, 9, 1, 5\}}
+    \item Ordenação final em P0: \texttt{\{1, 2, 3, 4, 5, 7, 8, 9\}}
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Nota:} A ordenação local é paralela. A fusão final ainda é sequencial.
+\end{frame}
+
+\begin{frame}{Atividade Prática: Bubble Sort Paralelo com MPI}
+\textbf{Objetivo:} Experimentar paralelismo com MPI no algoritmo Bubble Sort e analisar desempenho.
+
+\vspace{0.5em}
+\textbf{Tarefas:}
+\begin{enumerate}
+    \item Compile e execute o código Bubble Sort com MPI fornecido.
+    \item Modifique o vetor para os tamanhos: 32, 64, 128 e 256 elementos.
+    \item Execute com 2, 4 e 8 processos, e registre o tempo de execução.
+    \item Faça cada processo imprimir seu vetor local antes e depois da ordenação.
+    \item (Opcional) Implemente uma fusão (merge) no processo 0 para substituir a ordenação final.
+    \item Responda:
+    \begin{itemize}
+        \item Qual o impacto do número de processos no tempo?
+        \item Em quais situações houve ganho real?
+        \item Quais limitações você identificou?
+        \item Como melhorar a eficiência do algoritmo?
+    \end{itemize}
+\end{enumerate}
+
+\vspace{0.5em}
+\textbf{Dica:} Use \texttt{MPI\_Wtime()} para medir tempo.
+\end{frame}
+
+
+\end{document}

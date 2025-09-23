@@ -1,0 +1,276 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{green},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\title{Tutorial: Flask Monte Carlo com Docker e Kubernetes}
+\author{Me. Luis Vinicius Costa Silva}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Objetivo}
+Este tutorial mostra como criar uma aplicação Flask que realiza simulação Monte Carlo, empacotá-la em Docker e rodá-la em Kubernetes local (Minikube ou cluster local). A aplicação terá endpoints:
+
+\begin{itemize}
+    \item \texttt{/docker-info} - informações do container Docker
+    \item \texttt{/montecarlo/<n>} - simulação Monte Carlo em CPU única
+    \item \texttt{/montecarlo-distributed/<n>} - simulação distribuída em múltiplos pods
+\end{itemize}
+
+\section*{Atividade prática NF2}
+
+
+\begin{enumerate}
+    \item Fazer o \textbf{deploy da aplicação} usando Docker e Kubernetes.
+    \item Testar todos os endpoints:
+    \begin{itemize}
+        \item \texttt{/docker-info} para verificar informações do container.
+        \item \texttt{/montecarlo/<n>} para testar a simulação em CPU única.
+        \item \texttt{/montecarlo-distributed/<n>} para testar a simulação distribuída em múltiplos pods.
+    \end{itemize}
+    \item Modificar o código para adicionar um novo endpoint que execute uma variação da simulação Monte Carlo (exemplo: estimativa de área de uma função ou outra forma geométrica).
+    \item Utilizar o script \texttt{montecarlo\_aggregator.py} ou criar sua própria lógica para agregar resultados distribuídos.
+\end{enumerate}
+
+\subsection*{Critérios de avaliação}
+
+\begin{itemize}
+    \item Correto deploy da aplicação em Docker e Kubernetes.
+    \item Funcionamento correto de todos os endpoints.
+    \item Capacidade de modificação do código para criar um novo endpoint funcional.
+    \item Clareza e organização do código e testes.
+    \item Uso correto das ferramentas de container e cluster (Docker, Minikube/Kubernetes).
+\end{itemize}
+
+\subsection*{Modificação no código}
+
+Criar um endpoint \texttt{/montecarlo-square/<n>} que estima a área de um quadrado inscrito em um círculo usando Monte Carlo.
+
+Retornar tanto a estimativa da área quanto a proporção de pontos dentro da área esperada.
+
+Garantir que o endpoint funcione tanto em single CPU quanto em modo distribuído nos pods.
+
+
+
+\section{Aplicação Flask}
+
+Crie o arquivo \texttt{app.py}:
+
+\begin{lstlisting}[language=Python]
+import os
+import socket
+import random
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+# Função Monte Carlo
+def monte_carlo_pi(num_samples):
+    inside = 0
+    for _ in range(num_samples):
+        x, y = random.random(), random.random()
+        if x*x + y*y <= 1.0:
+            inside += 1
+    return (4.0 * inside) / num_samples
+
+@app.route('/')
+def index():
+    return jsonify({
+        "message": "Hello Flask + Kubernetes",
+        "endpoints": [
+            "/docker-info",
+            "/montecarlo/<n>",
+            "/montecarlo-distributed/<n>"
+        ]
+    })
+
+@app.route('/docker-info')
+def docker_info():
+    return jsonify({
+        "hostname": socket.gethostname(),
+        "cwd": os.getcwd(),
+        "env": dict(list(os.environ.items())[:10])
+    })
+
+@app.route('/montecarlo/<int:n>')
+def montecarlo_single(n):
+    pi_est = monte_carlo_pi(n)
+    return jsonify({
+        "samples": n,
+        "pi_estimate": pi_est,
+        "mode": "single-cpu"
+    })
+
+@app.route('/montecarlo-distributed/<int:n>')
+def montecarlo_distributed(n):
+    replicas = int(os.getenv("POD_REPLICAS","1"))
+    pod_index = int(os.getenv("POD_INDEX","0"))
+    per_pod = n // replicas
+    pi_est = monte_carlo_pi(per_pod)
+    return jsonify({
+        "samples_total": n,
+        "samples_this_pod": per_pod,
+        "replicas": replicas,
+        "pod_index": pod_index,
+        "pi_partial": pi_est
+    })
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080, debug=True)
+\end{lstlisting}
+
+\section{Docker}
+
+\subsection{Dockerfile}
+
+Crie o arquivo \texttt{Dockerfile}:
+
+\begin{lstlisting}[language=bash]
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8080
+
+CMD ["python", "app.py"]
+\end{lstlisting}
+
+\subsection{requirements.txt}
+
+\begin{lstlisting}[language=bash]
+flask
+\end{lstlisting}
+
+\subsection{Build e Run}
+
+\begin{lstlisting}[language=bash]
+docker build -t flask-montecarlo:latest .
+docker run -p 8080:8080 flask-montecarlo
+\end{lstlisting}
+
+\subsection{Testando endpoints}
+
+\begin{lstlisting}[language=bash]
+curl http://127.0.0.1:8080/docker-info
+curl http://127.0.0.1:8080/montecarlo/1000000
+\end{lstlisting}
+
+\section{Kubernetes}
+
+\subsection{Deployment + Service}
+
+Crie o arquivo \texttt{kube-flask-montecarlo.yaml}:
+
+\begin{lstlisting}[language=yaml]
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-montecarlo-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: flask-montecarlo
+  template:
+    metadata:
+      labels:
+        app: flask-montecarlo
+    spec:
+      containers:
+      - name: flask-montecarlo
+        image: flask-montecarlo:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+        - name: POD_REPLICAS
+          value: "3"
+        - name: POD_INDEX
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-montecarlo-service
+spec:
+  selector:
+    app: flask-montecarlo
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+\end{lstlisting}
+
+\subsection{Aplicando no cluster}
+
+\begin{lstlisting}[language=bash]
+kubectl apply -f kube-flask-montecarlo.yaml
+kubectl get pods
+kubectl get svc
+\end{lstlisting}
+
+\subsection{Acessando endpoints}
+
+\begin{itemize}
+    \item \textbf{Port-forward:}
+\begin{lstlisting}[language=bash]
+kubectl port-forward service/flask-montecarlo-service 8080:8080
+curl http://127.0.0.1:8080/montecarlo-distributed/1000000
+\end{lstlisting}
+    \item \textbf{Minikube service:}
+\begin{lstlisting}[language=bash]
+minikube service flask-montecarlo-service --url
+curl http://<URL>/montecarlo-distributed/1000000
+\end{lstlisting}
+\end{itemize}
+
+\section{Observações}
+
+\begin{itemize}
+    \item Cada pod calcula apenas sua parte da simulação distribuída.
+    \item Para obter o valor final de $\pi$, é necessário agregar os resultados (ex: script Python externo).
+    \item Em Docker local, você pode testar apenas `montecarlo` single CPU.
+\end{itemize}
+
+
+\end{document}
+

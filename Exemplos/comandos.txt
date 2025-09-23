@@ -1,0 +1,4 @@
+mpicc <nome_do_arquivo.c> -o nome_do_executavel  #compila
+mpirun --oversubscribe -np <# nucleos> ./<nome_do_executavel> #roda
+mpirun -hostfile hosts.txt -np 4 ./exemplo #roda em multiplas maquinas
+
